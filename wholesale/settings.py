@@ -93,14 +93,13 @@ DATABASES = {
 }
 """
 
-
+# i build mydb on localhost but y can connect on cloud
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
         'NAME': 'mydb',
         'CLIENT': {
             'host': 'mongodb://localhost:27017/',
-            # 'port': '27017'
         }
     }
 }
