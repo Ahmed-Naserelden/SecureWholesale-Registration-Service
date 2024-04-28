@@ -1,0 +1,103 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f7f7f7;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+h1 {
+    color: #333;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+form {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    width: 600px;
+    max-width: 80%;
+    box-sizing: border-box;
+    margin-bottom: 0px;
+}
+
+p {
+    color: #555;
+    margin-bottom: 10px;
+}
+
+input, select {
+    width: 100%;
+    padding: 13px;
+    box-sizing: border-box;
+    margin-bottom: 0px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+select{
+    margin-bottom: 10px;
+}
+input[type="submit"] {
+    background-color: #003366;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 13px;
+    width: 100%;
+    margin-bottom: 0px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+ul, span{
+    display: none;
+}
+
+input[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+a {
+    color: black;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+}
+
+a:hover {
+    color: 003366;
+}
+
+p.error-message {
+    color: red;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.location , .names,.contact{
+    display: flex;
+    justify-content: space-between;
+}
+
+.location div{
+    width: calc(32.3%);
+}
+
+.names div, .contact div{
+    width: calc(49%);
+}
+
+form{
+    line-height: 15px;
+}
+
+input{
+    height: 40px;
+}

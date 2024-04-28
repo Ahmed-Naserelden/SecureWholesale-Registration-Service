@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel='stylesheet' href="{% static 'css/register.css'%}">
+    <title>Register</title>
+    <style>
+        .is-tager{
+            display:none;
+        }
+        .bove-form{
+            width: 600px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 5px;
+            width: 600px;
+            max-width: 80%;
+            box-sizing: border-box;
+            margin-bottom: 0px;
+            margin-bottom: 0.5%;
+            display: flex;
+            justify-content: space-between;
+        }
+        .bove-form button{
+            width: 33%;
+            height: 33px;
+            border-radius: 3px;
+            color: #fff;
+            background-color: #003366;
+        }
+
+        .bove-form button:hover{
+            background-color: #45a049;
+        }
+        input{
+            margin-bottom: 0.6%;
+        }
+        /* .user, .permission, .organization{
+            display: none;
+        } */
+
+    </style>
+
+</head>
+<body>
+    <h1>Register</h1>
+    {% for mes in messages %}
+        <p class="error-message">{{ mes }}</p>
+    {% endfor %}
+    <form action="" method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <select name="entity" id="entity" required>
+            <option value="" selected disabled>Select One</option>
+            <option value="organization">Organization</option>
+            <option value="user">User</option>
+            <option value="permission">Permissions</option>
+        </select>
+
+        <br>  <br>
+
+        <div class="form-body" id="form-body">
+        </div>
+
+        <input type="submit" value="Register">
+    </form>
+    
+    <p><a href="{% url 'signin' %}">Already have an account? Sign in here</a></p>
+
+
+    
+<script>
+    document.getElementById('entity').addEventListener('change', function() {
+        var selectedValue = this.value;
+        var orgDiv = document.querySelector('.organization');
+        var perDiv = document.querySelector('.permission');
+        var userDiv = document.querySelector('.user');
+        
+        // Check if the selected value is 'volvo'
+        if (selectedValue === 'organization') {
+
+            fillformbody(1);
+        } else if (selectedValue === 'permission') {
+            fillformbody(3);
+        }else if(selectedValue === 'user'){
+            fillformbody(2);
+        }else{
+        }
+    });
+
+    function fillformbody(x){
+            formbody = document.getElementById('form-body');
+
+            let organization = `
+                <div class="organization">
+                    <input type="text" value="4848515919" name="org_id" placeholder="Org ID" required>
+                    <input type="text" value="4523555445" name="license_id" placeholder="License ID" required>
+                    <input type="text"  value="1" name="org_status" placeholder="Org Status">
+
+                    <input type="text" value="typo" name="org_type" placeholder="Org Type" required>
+                    <input type="text" value="Value" name="org_name" placeholder="Org Name" required>
+                    <input type="text" value="4848315818" name="org_fin_id" placeholder="Org Financial ID">
+
+                    <input type="text" value="21483" name="finan_limit_from" placeholder="Financial Limit From" required>
+                    <input type="text" value="61483"  name="finan_limit_to" placeholder="Financial Limit To" required>
+
+                    <input type="email" value="value@gmail.com"  name="email" placeholder="Enter Email Address" required>
+                    <input type="password" value="__init__" minlength="8" name="password" placeholder="Password" required>
+
+                    <input type="text" value="bankaccount" name="bank_account" placeholder="Bank Account" required>
+                    <input type="text"  value="orgatach" name="org_attch" placeholder="Org Attachments" required>
+                </div>
+            `;
+
+            let user = `
+                <div class="user">
+                    <input type="text" value="3829343594" name="org_id" placeholder="Org ID" required>
+                    <input type="text" value="daf" name="org_name" placeholder="Org Name" required>
+
+                    <input type="text" value="2256335" name="org_admin_id" placeholder="Org Admin ID" required>
+                    <input type="text" value="58665555" name="permission_id" placeholder="Permissions ID">
+
+                    <input type="text" value="1" name="user_status" placeholder="User Status">
+                    
+                    <input type="text" value="15886658" name="bus_user_id" placeholder="Business User ID">
+                    
+                    <input type="text" value="bebo" name="username" placeholder="User Name" required>
+                    <input type="email" value="bebo@bebo.com" name="email" placeholder="Enter Email Address" required>
+                    <input type="password" value="__init__" minlength="8" name="password" placeholder="Password" required>
+
+                    <input type="text" value="attachment" name="user_attch" placeholder="User Attachments">
+                </div>
+            `;
+            
+            let permission = `
+                <div class="permission">
+                    <input type="text" value="2536626" name="perm_id" placeholder="Permission ID" required>
+
+                    <input type="text" value="55256" name="org_id" placeholder="Org ID" required>
+                    
+                    <input type="text" value="axceed" name="org_name" placeholder="Org Name" required>
+
+                    <input type="text" value="25563" name="org_admin_id" placeholder="Org Admin ID" required>
+
+                    <input type="text" value="1" name="user_status" placeholder="User Status">
+                    
+                    <input type="text" value="1" name="super_admin" placeholder="Super Admin">
+                    
+                    <input type="text" value="mohamed ahmed" name="org_admin" placeholder="Orgnaization Admin" required>
+                    
+                    <input type="text" value="Ali saber" name="merchant" placeholder="Merchant" required>
+                    
+                    <input type="email" value="perm@perm.com" name="email" placeholder="Enter Email Address" required>
+                    
+                    <input type="password" value="__init__" minlength="8" name="password" placeholder="Password" required>
+
+
+                    <input type="text" value="1" name="service_agent" placeholder="Service Agent">
+                
+                    <input type="text" value="1" name="field_agent " placeholder="Field Agent">
+
+                    <input type="text" value="1" name="inventory_worker" placeholder="Inventory worker">
+
+                    <input type="text" value="1" name="consumer" placeholder="Inventory worker">
+
+                
+                </div> 
+                `;
+            
+            formbody.innerHTML = "";
+
+            if(x == 1){
+                formbody.innerHTML = organization;
+            }else if (x == 2){
+                formbody.innerHTML = user;
+            }else if (x == 3){
+                formbody.innerHTML = permission;
+            }
+};
+</script>
+</body>
+</html>
+
+
+
+

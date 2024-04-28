@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel='stylesheet' href="{% static 'css/login.css'%}">
+    <title>Login</title>
+    <style>
+        
+    </style>
+</head>
+<body>
+    <h1>Login</h1>
+    {% for mes in messages %}
+        <p class="error-message">{{ mes }}</p>
+    {% endfor %}
+    <form action="" method="POST">
+        {% csrf_token %}
+        <p>Email</p>
+        <input type="email" name="email" placeholder="ahmed@amer.com" required>
+        <p>Password</p>
+        <input type="password" minlength="8" name="password" placeholder="p@2sW0rd2#3" required>
+        <input type="submit" value="Login">
+    </form>
+    <p><a href="{% url 'signup' %}">Don't have an account? Sign up here</a></p>
+
+</body>
+</html>
