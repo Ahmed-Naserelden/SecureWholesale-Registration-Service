@@ -78,7 +78,7 @@ def signup(request):
             try:
                 user = User.objects.create_user(username=email, email=email, password=password)
                 user.save()
-
+                data.pop('password')
                 try:
                     collection = db['organizations']
                     result = collection.insert_one(data)
@@ -102,7 +102,7 @@ def signup(request):
             try:
                 user = User.objects.create_user(username=email, email=email, password=password)
                 user.save()
-
+                data.pop('password')
                 try:
                     collection = db['users']
                     result = collection.insert_one(data)
@@ -121,12 +121,13 @@ def signup(request):
             
             data = json_perm_data(request.POST)
             
-            print(data)
+            
+            # print(data)
             
             try:
                 user = User.objects.create_user(username=email, email=email, password=password)
                 user.save()
-
+                data.pop('password')
                 try:
                     collection = db['permissions']
                     result = collection.insert_one(data)
@@ -151,3 +152,7 @@ def home(request):
 def signout(request):
     logout(request)
     return redirect(signin)
+
+
+def error_404_view(request, exception):
+    return render(request, '404.html', status=404)

@@ -4,16 +4,46 @@
 ## Table of Contents
 
 - [Requirements](#requirements)
+- [MongoDB Configuration](#MongoDB-Configuration)
 - [Installation](#installation)
 
 ## Requirements
 
-List the prerequisites and dependencies required to run the project. Include links or version numbers.
+List the prerequisites and dependencies required to run the project. Include links or version numbers ([Installation](#installation)).
 
 - Python (3.11.4)
 - Django (4.1.13)
 - djangorestframework (3.14.0)
 - pymongo (3.12.3)
+
+
+## MongoDB Configuration
+This project uses `MongoDB` as its database backend. Ensure that `MongoDB` is installed and running on your system.
+
+### Database and Collections
+
+The project interacts with a MongoDB database named `mydb`:
+
+```bash
+# Connect to MongoDB shell
+mongo
+
+# Create the mydb database
+use mydb
+
+# Create collections (users, organizations, permissions)
+db.createCollection("users")
+db.createCollection("organizations")
+db.createCollection("permissions")
+```
+
+which contains the following `collections`:
+
+- `users`: Stores information about users.
+- `organizations`: Stores information about organizations. 
+- `permissions`: Stores information about permissions.
+
+Ensure that these collections are present in your `MongoDB` database for the project to function correctly.
 
 ## Installation
 
@@ -50,25 +80,33 @@ Provide step-by-step instructions to set up the project locally.
     ```bash
     pip install -r requirements.txt
     ```
-    > Once installed, configure your Django project's `wholesale/settings.py` file to use MongoDB as the database backend. Here's an example configuration:
 
+    Once installed, configure your Django project's `wholesale/settings.py` file to use MongoDB as the database backend. Here's an example configuration:
+
+    > **Note**: 
+    >
+    > For local development, the project is configured to connect to a MongoDB database running on localhost. **Don't** edit anything in the database configuration `wholesale/settings.py` if you intend to connect with the local environment. 
     ```python
     # wholesale/settings.py
-
+    
     DATABASES = {
         'default': {
             'ENGINE': 'djongo',
             'NAME': 'mydb',  # Specify the name of your MongoDB database
             'ENFORCE_SCHEMA': False,
             'CLIENT': {
-                'host': 'localhost',  # MongoDB host
-                'port': 27017,  # MongoDB port
+                'host': 'your_cluster_name.mongodb.net',  # MongoDB Cloud host
+                'port': 27017,  # MongoDB default port
                 'username': 'your_username',  # MongoDB username
                 'password': 'your_password',  # MongoDB password
                 'authSource': 'admin',  # Authentication database
+                'ssl': True,  # Enable SSL encryption
+                'retryWrites': True,  # Enable retryable writes
+                'retryReads': True,  # Enable retryable reads
             }
         }
     }
+
     ```
 
 6. **Migrate the Database**: Run database migrations to create necessary tables:
@@ -84,34 +122,6 @@ Provide step-by-step instructions to set up the project locally.
     python manage.py runserver
     ```
 
-
-## MongoDB Configuration
-This project uses `MongoDB` as its database backend. Ensure that `MongoDB` is installed and running on your system.
-
-### Database and Collections
-
-The project interacts with a MongoDB database named `mydb`:
-
-```bash
-# Connect to MongoDB shell
-mongo
-
-# Create the mydb database
-use mydb
-
-# Create collections (users, organizations, permissions)
-db.createCollection("users")
-db.createCollection("organizations")
-db.createCollection("permissions")
-```
-
-which contains the following `collections`:
-
-- `users`: Stores information about users.
-- `organizations`: Stores information about organizations. 
-- `permissions`: Stores information about permissions.
-
-Ensure that these collections are present in your `MongoDB` database for the project to function correctly.
 
 ## Run in Postman
 Want to quickly test the API endpoints? Click the button below to run the `Postman` collection:

@@ -3,11 +3,13 @@ from django.http import HttpResponse
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate, login, logout
-
+from django.contrib.auth.decorators import login_required
 from django.http import Http404
 
 from rest_framework import status
 from rest_framework.response import Response
+
+from .permissions import IsOwnerOrAdmin, IsAdminToUpdate
 
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.decorators import api_view, permission_classes
@@ -86,11 +88,11 @@ def json_cust_data(data):
 
 @api_view(['POST'])
 def signin(request):
-    username = request.data.get('username')
+    username = request.data.get('email')
     password = request.data.get('password')
 
     if not username or not password:
-        return Response({'error': 'Both username and password are required'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'message': 'Both username and password are required'}, status=status.HTTP_400_BAD_REQUEST)
 
 
     print(request.data)
@@ -104,7 +106,7 @@ def signin(request):
         token, created = Token.objects.get_or_create(user=user)
         return Response({'message': 'Authentication successful', 'token': token.key}, status=status.HTTP_200_OK)
     
-    return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+    return Response({'message': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['POST'])
 def signup(request):
@@ -119,6 +121,8 @@ def signup(request):
         user = User.objects.create_user(username=email, email=email, password=password)
         user.save()
 
+        data.pop("password")
+
         document = json_org_data(data)
         print(document)
 
@@ -126,7 +130,7 @@ def signup(request):
         
         result = collection.insert_one(document)
 
-        return Response({"data": data, "_id": str(result.inserted_id)})
+        return Response({"data": data, "_id": str(result.inserted_id)}, status=status.HTTP_201_CREATED)
 
     elif data.get('user_type') == 'customer':
         ret = check_cust_attr(data)
@@ -138,12 +142,14 @@ def signup(request):
 
         user = User.objects.create_user(username=email, email=email, password=password)
         user.save()
+        data.pop("password")
+
 
         document = json_cust_data(data)
 
         collection = db['users']
         result = collection.insert_one(document)
-        return Response({"data": data, "_id": str(result.inserted_id)})
+        return Response({"data": data, "_id": str(result.inserted_id)}, status=status.HTTP_201_CREATED)
     
 
     elif data.get('user_type') == 'permission':
@@ -155,14 +161,15 @@ def signup(request):
         user = User.objects.create_user(username=email, email=email, password=password)
 
         user.save()
+        data.pop("password")
 
         document = json_cust_data(data)
 
         collection = db['permissions']
         result = collection.insert_one(document)
-        return Response({"data": data, "_id": str(result.inserted_id)})
+        return Response({"data": data, "_id": str(result.inserted_id)}, status=status.HTTP_201_CREATED)
 
-    return Response({'err': 'error', 'user_type': 'required'},)
+    return Response({'message': 'error', 'user_type': 'required'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -174,13 +181,33 @@ def signout(request):
         "message": f"logout {username} successfully"
     }, status=status.HTTP_200_OK)
 
+
+@api_view(['PUT'])
+@login_required
+def change_password(request):
+    user = request.user
+
+    data = request.data
+
+    old_password = data.get('old_password')
+    new_password = data.get('new_password')
+    print(old_password, new_password)
+    if not old_password or not new_password:
+        return Response({'error': 'Both old_password and new_password are required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if user.check_password(old_password):
+        user.set_password(new_password)
+        user.save()
+        return Response({'messege': 'password_updated'}, status=status.HTTP_200_OK)
+    return Response({'error': 'Old password is incorrect'}, status=status.HTTP_400_BAD_REQUEST)
+
 # ======================================================================================================================================================
 # = Single Level  ======================================================================================================================================
 # ======================================================================================================================================================
 
 
 @api_view(['GET', 'PUT'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, IsOwnerOrAdmin])
 def user(request, pk):
     collection = db['users']
     if request.method == 'GET':
@@ -188,9 +215,9 @@ def user(request, pk):
             document = collection.find_one({'_id': ObjectId(pk)})
             document = { f'{doc}': f'{document[doc]}' for doc in document}
         except:
-            return Response({"error": f'{pk} not exist'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"message": f'{pk} not exist'}, status=status.HTTP_404_NOT_FOUND)
         
-        return Response({"document": document}, status=status.HTTP_200_OK)
+        return Response({"data": document}, status=status.HTTP_200_OK)
 
     if request.method == 'PUT':
         data = request.data
@@ -207,16 +234,16 @@ def user(request, pk):
         try:
             result = collection.update_one({'_id': ObjectId(pk)}, {'$set': data})
         except:
-            return Response({'error': 'Error in Trying update user. id may be not exist !'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'error in trying update user. id may be not exist !'}, status=status.HTTP_404_NOT_FOUND)
 
         if result.modified_count > 0:
-            return Response({'message': 'Document updated successfully'}, status=status.HTTP_202_ACCEPTED)
+            return Response({'message': 'user document updated successfully'}, status=status.HTTP_200_OK)
         else:
-            return Response({'error': 'No changes made or Document not found'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'user document not found or no changes made to update'}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET', 'PUT'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, IsOwnerOrAdmin])
 def organization(request, pk):
 
     collection = db['organizations']
@@ -243,16 +270,16 @@ def organization(request, pk):
         try:
             result = collection.update_one({'_id': ObjectId(pk)}, {'$set': data})
         except:
-            return Response({'error': 'Error in Trying update organization. id may be not exist !'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'error in trying update organization. id may be not exist !'}, status=status.HTTP_404_NOT_FOUND)
 
         if result.modified_count > 0:
-            return Response({'message': 'Document updated successfully'}, status=status.HTTP_202_ACCEPTED)
+            return Response({'message': 'organization document updated Successfully'}, status=status.HTTP_200_OK)
         else:
-            return Response({'error': 'Document not found or no changes made'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'organization document not found or no changes made to update'}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET', 'PUT'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, IsOwnerOrAdmin])
 def permission(request, pk):
 
     collection = db['permissions']
@@ -278,12 +305,12 @@ def permission(request, pk):
         try:
             result = collection.update_one({'_id': ObjectId(pk)}, {'$set': data})
         except:
-            return Response({'error': 'Error in Trying update permission. id may be not exist !'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'error in trying update permission. id may be not exist !'}, status=status.HTTP_404_NOT_FOUND)
 
         if result.modified_count > 0:
-            return Response({'message': 'Document updated successfully'}, status=status.HTTP_202_ACCEPTED)
+            return Response({'message': 'permission document updated Successfully'}, status=status.HTTP_200_OK)
         else:
-            return Response({'error': 'Document not found or no changes made'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'permission document not found or no changes made to update'}, status=status.HTTP_404_NOT_FOUND)
 
 
 # ======================================================================================================================================================
@@ -292,14 +319,13 @@ def permission(request, pk):
 
 
 @api_view(['GET', 'PUT'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, IsAdminToUpdate])
 def users_list(request):
     collection = db['users']
 
     if request.method == 'GET':
         cursor = collection.find()
 
-        # documents_list = [{ f"{at}": document[at] for at in cust_attrs} for document in cursor]
         documents_list = []
 
         for document in cursor:
@@ -339,12 +365,12 @@ def users_list(request):
                 result = collection.update_one({'_id': ObjectId(pk)}, {'$set': document})
             except:
                 ids_not_updated_its_document.append(pk)
-                return Response({'error': 'Error in Trying update many users', '_id_not_found': pk}, status=status.HTTP_404_NOT_FOUND)
+                return Response({'error': 'error in trying update many users', '_id_not_found': pk}, status=status.HTTP_404_NOT_FOUND)
             # break
-        return Response({"Right": 'Allah Is Only One.'}, status=status.HTTP_202_ACCEPTED)
+        return Response({"message": 'users documents updated successfully'}, status=status.HTTP_200_OK)
 
 @api_view(['GET', 'PUT'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, IsAdminToUpdate])
 def organizations_list(request):
     collection = db['organizations']
 
@@ -390,12 +416,12 @@ def organizations_list(request):
                 result = collection.update_one({'_id': ObjectId(pk)}, {'$set': document})
             except:
                 ids_not_updated_its_document.append(pk)
-                return Response({'error': 'Error in Trying update many orgnazations', '_id_not_found': pk}, status=status.HTTP_404_NOT_FOUND)
+                return Response({'error': 'error in trying update many orgnazations', '_id_not_found': pk}, status=status.HTTP_404_NOT_FOUND)
             # break
-        return Response({"Right": 'Allah Is Only One.'}, status=status.HTTP_202_ACCEPTED)
+        return Response({"message": 'organization documents updated successfully'}, status=status.HTTP_200_OK)
 
 @api_view(['GET', 'PUT'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, IsAdminToUpdate])
 def permissions_list(request):
     collection = db['permissions']
 
@@ -441,9 +467,9 @@ def permissions_list(request):
                 result = collection.update_one({'_id': ObjectId(pk)}, {'$set': document})
             except:
                 ids_not_updated_its_document.append(pk)
-                return Response({'error': 'Error in Trying update many permissions', '_id_not_found': pk}, status=status.HTTP_404_NOT_FOUND)
+                return Response({'error': 'error in trying update many permissions', '_id_not_found': pk}, status=status.HTTP_404_NOT_FOUND)
             # break
-        return Response({"Right": 'Allah Is Only One.'}, status=status.HTTP_202_ACCEPTED)
+        return Response({"message": 'permissions documents updated successfully'}, status=status.HTTP_200_OK)
 
 # ======================================================================================================================================================
 # ======================================================================================================================================================

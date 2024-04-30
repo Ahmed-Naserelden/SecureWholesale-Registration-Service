@@ -13,7 +13,9 @@ urlpatterns = [
     path('organizations/<str:pk>/', views.organization, name='organization'),
     
     path('permissions/', views.permissions_list, name='perm_list'),
-    path('permissions/<str:pk>/', views.permission, name='permission')
+    path('permissions/<str:pk>/', views.permission, name='permission'),
+
+    path('change-password/', views.change_password),
 
 ]
 
