@@ -119,7 +119,7 @@ Provide step-by-step instructions to set up the project locally.
     ```
 8. **Run the Development Server**: Start the Django development server to run the project locally:
     ```bash
-    python manage.py runserver
+    python manage.py runserver 0.0.0.0:8000
     ```
 
 
