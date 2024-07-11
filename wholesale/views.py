@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse
 from django.contrib.auth.models import User
-
+from .settings import DATABASE_HOST
 from django.contrib import messages
 # Create your views here.
 import pymongo
@@ -10,7 +10,7 @@ from pymongo import MongoClient
 from bson.objectid import ObjectId 
 from bson import json_util
 
-client = pymongo.MongoClient("mongodb://db:27017/")
+client = pymongo.MongoClient(f"mongodb://{DATABASE_HOST}:27017/")
 db = client["mydb"]
 
 # Start of the block

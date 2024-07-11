@@ -21,8 +21,10 @@ import pymongo
 from pymongo import MongoClient
 from bson.objectid import ObjectId 
 # Start of the block
+from wholesale.settings import DATABASE_HOST
 
-client = pymongo.MongoClient("mongodb://db:27017/")
+
+client = pymongo.MongoClient(f"mongodb://{DATABASE_HOST}:27017/")
 db = client["mydb"]
 # End of the block
 

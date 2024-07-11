@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 import os
 from pathlib import Path
 
+DATABASE_HOST="db"
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -99,7 +101,7 @@ DATABASES = {
         'ENGINE': 'djongo',
         'NAME': 'mydb',
         'CLIENT': {
-            'host': 'db',
+            'host': DATABASE_HOST,
             'port': 27017,
         }
     }

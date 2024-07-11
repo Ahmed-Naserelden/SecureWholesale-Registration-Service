@@ -4,8 +4,12 @@
 ## Table of Contents
 
 - [Requirements](#requirements)
-- [MongoDB Configuration](#MongoDB-Configuration)
-- [Installation](#installation)
+- How to Run the Service
+    - 1<sup>st</sup> Way ( Following steps.)
+        - [MongoDB Configuration](#mongodb-configuration)
+        - [Installation](#installation)
+    - 2<sup>nd</sup> Way (**Conainerization**)
+        - [Conainerization](#conainerization)
 
 ## Requirements
 
@@ -34,14 +38,12 @@ use mydb
 # Create collections (users, organizations, permissions)
 db.createCollection("users")
 db.createCollection("organizations")
-db.createCollection("permissions")
 ```
 
 which contains the following `collections`:
 
 - `users`: Stores information about users.
 - `organizations`: Stores information about organizations. 
-- `permissions`: Stores information about permissions.
 
 Ensure that these collections are present in your `MongoDB` database for the project to function correctly.
 
@@ -51,12 +53,12 @@ Provide step-by-step instructions to set up the project locally.
 
 1. **Clone the Repository**: Begin by cloning the repository to your local machine:
    ```bash
-   git clone https://github.com/Ahmed-Naserelden/Wholesale-Authentication-Api.git
+   https://github.com/Ahmed-Naserelden/Wholesale-Registration-Service.git
     ```
 
 2. **Navigate to the Project Directory**: Move into the project directory:
     ```bash
-    cd Wholesale-Authentication-Api
+    cd Wholesale-Registration-Service
     ```
 
 3. **Create a Virtual Environment (Optional but Recommended)**: It's good practice to work within a virtual environment to keep your dependencies isolated:
@@ -122,6 +124,23 @@ Provide step-by-step instructions to set up the project locally.
     python manage.py runserver 0.0.0.0:8000
     ```
 
+
+## 2<sup>nd</sup> Way (**Conainerization**)
+### Conainerization
+
+1. Navigate to the project directory:
+``` bash
+cd Wholesale-Registration-Service/
+```
+2. Build and run the Docker containers:
+``` bash
+docker-compose up
+```
+
+3. Open your browser and navigate to:
+``` bash
+http://localhost:8000/
+```
 
 ## Run in Postman
 Want to quickly test the API endpoints? Click the button below to run the `Postman` collection:
