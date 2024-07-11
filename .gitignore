@@ -5,3 +5,4 @@ wholesale/__pycache__/
 setup-collections.sh
 setup-collections.ps1
 setup-collections*
+.env/

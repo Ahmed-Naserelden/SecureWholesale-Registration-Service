@@ -99,7 +99,8 @@ DATABASES = {
         'ENGINE': 'djongo',
         'NAME': 'mydb',
         'CLIENT': {
-            'host': 'mongodb://localhost:27017/',
+            'host': 'db',
+            'port': 27017,
         }
     }
 }

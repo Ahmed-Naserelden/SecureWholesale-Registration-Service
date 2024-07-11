@@ -22,7 +22,7 @@ from pymongo import MongoClient
 from bson.objectid import ObjectId 
 # Start of the block
 
-client = pymongo.MongoClient("mongodb://localhost:27017/")
+client = pymongo.MongoClient("mongodb://db:27017/")
 db = client["mydb"]
 # End of the block
 

@@ -1,5 +1,5 @@
 # Use an official Python runtime as a parent image
-FROM python:3.9
+FROM python:3.9-slim
 
 # Set environment variables
 ENV PYTHONUNBUFFERED 1
@@ -11,15 +11,13 @@ WORKDIR /app
 COPY . /app/
 
 # Install any needed packages specified in requirements.txt
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Install MongoDB
-RUN apt-get update && && apt-get upgrade -y && apt-get install -y mongodb
+RUN apt-get update && apt-get upgrade -y
 
-RUN python manage.py migrate
+# Run entrypoint script but first make it excutable
+RUN chmod +x ./entrypoint.sh
 
-# Expose the port your Django app runs on
-EXPOSE 8000
-
-# Run Django's development server
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Run entrypoint.sh when the container launches
+ENTRYPOINT ["./entrypoint.sh"]
